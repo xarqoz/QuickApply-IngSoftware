@@ -1,10 +1,11 @@
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
-import logoImage from 'figma:asset/1d0c3ab6a7370d91ecf7903a3f2fa35d01415719.png';
+
+type ViewName = 'home' | 'login' | 'profile' | 'jobs' | 'dashboard' | 'extension';
 
 interface HeaderProps {
-  currentView: 'home' | 'login' | 'profile' | 'jobs' | 'dashboard';
-  onNavigate: (view: 'home' | 'login' | 'profile' | 'jobs' | 'dashboard') => void;
+  currentView: ViewName;
+  onNavigate: (view: ViewName) => void;
   isLoggedIn: boolean;
   onLogout: () => void;
 }
@@ -17,7 +18,7 @@ export function Header({ currentView, onNavigate, isLoggedIn, onLogout }: Header
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => onNavigate('home')}>
-            <img src={logoImage} alt="QuickApply" className="h-10 w-auto" />
+            <div className="text-xl font-semibold text-primary">QuickApply</div>
           </div>
 
           <nav className="hidden md:flex items-center gap-6">
@@ -54,6 +55,14 @@ export function Header({ currentView, onNavigate, isLoggedIn, onLogout }: Header
                   }`}
                 >
                   Mi Perfil
+                </button>
+                <button
+                  onClick={() => onNavigate('extension')}
+                  className={`hover:text-primary transition-colors ${
+                    currentView === 'extension' ? 'text-primary' : 'text-foreground'
+                  }`}
+                >
+                  Extensión
                 </button>
                 <button
                   onClick={onLogout}
@@ -129,6 +138,17 @@ export function Header({ currentView, onNavigate, isLoggedIn, onLogout }: Header
                   >
                     Mi Perfil
                   </button>
+                    <button
+                      onClick={() => {
+                        onNavigate('extension');
+                        setMobileMenuOpen(false);
+                      }}
+                      className={`text-left ${
+                        currentView === 'extension' ? 'text-primary' : 'text-foreground'
+                      }`}
+                    >
+                      Extensión
+                    </button>
                   <button
                     onClick={() => {
                       onLogout();

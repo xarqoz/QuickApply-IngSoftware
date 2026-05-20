@@ -1,32 +1,31 @@
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { Mail, Lock } from 'lucide-react';
-import logoImage from 'figma:asset/1d0c3ab6a7370d91ecf7903a3f2fa35d01415719.png';
 
 interface LoginPageProps {
-  onLogin: (email: string, password: string) => void;
+  onAuth: (email: string, password: string, isRegister: boolean) => void;
 }
 
-export function LoginPage({ onLogin }: LoginPageProps) {
+export function LoginPage({ onAuth }: LoginPageProps) {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!isLogin && password !== confirmPassword) {
       alert('Las contraseñas no coinciden');
       return;
     }
-    onLogin(email, password);
+    onAuth(email, password, !isLogin);
   };
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <img src={logoImage} alt="QuickApply" className="h-20 w-auto mx-auto mb-4" />
+          <div className="h-20 flex items-center justify-center mx-auto mb-4 rounded-full bg-primary/10 text-primary text-2xl font-bold">QA</div>
           <h2 className="mb-2">{isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'}</h2>
           <p className="text-muted-foreground">
             {isLogin
