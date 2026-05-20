@@ -1,3 +1,5 @@
+console.log('[QuickApply] content script injected on', location.href);
+
 const getFieldKey = (element) => {
   const name = (element.name || element.id || '').toLowerCase();
   const placeholder = (element.placeholder || '').toLowerCase();
@@ -37,7 +39,25 @@ const gatherFields = () => {
 const getProfileFromStorage = () =>
   new Promise((resolve) => {
     chrome.storage.local.get(['quickapplyUserId'], (result) => {
-      resolve(result.quickapplyUserId || null);
+      const browserUserId = window.localStorage.getItem('quickapplyUserId');
+      const userId = result.quickapplyUserId || browserUserId || null;
+      console.log('[QuickApply] extension storage userId:', result.quickapplyUserId, 'page storage userId:', browserUserId);
+      resolve(userId);
+    });
+  });
+
+const fetchProfileFromBackground = (userId) =>
+  new Promise((resolve) => {
+    chrome.runtime.sendMessage({ type: 'fetch-profile', userId }, (response) => {
+      if (chrome.runtime.lastError) {
+        console.error('[QuickApply] runtime sendMessage error', chrome.runtime.lastError);
+        return resolve(null);
+      }
+      if (response?.error) {
+        console.error('[QuickApply] background profile error', response.error);
+        return resolve(null);
+      }
+      resolve(response?.profile || null);
     });
   });
 
@@ -48,10 +68,7 @@ const fillFormWithProfile = async () => {
     return;
   }
 
-  const profile = await fetch(`http://localhost:3000/api/profile/${userId}`)
-    .then((resp) => resp.json())
-    .then((json) => json.profile)
-    .catch(() => null);
+  const profile = await fetchProfileFromBackground(userId);
 
   if (!profile) {
     alert('No se pudo cargar el perfil. Asegúrate de que el backend esté activo y que hayas iniciado sesión.');
